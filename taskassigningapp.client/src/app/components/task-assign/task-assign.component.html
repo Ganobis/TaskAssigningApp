@@ -1,0 +1,87 @@
+<div class="task-assign-container" *ngIf="!isLoading; else loading">
+  <h2>Assign Tasks to User</h2>
+
+  <!-- Użytkownik -->
+  <label for="userSelect">Select User:</label>
+  <select id="userSelect" [(ngModel)]="SelectedUserId">
+    <option value="" disabled selected>Select a user</option>
+    <option *ngFor="let user of users" [value]="user.id">
+      {{ user.name }} ({{ user.type }})
+    </option>
+  </select>
+
+  <!-- Zadania -->
+  <h3>Available Tasks</h3>
+  <div class="task-list">
+    <div *ngFor="let task of availibleTasks" class="task-item">
+      <input 
+        type="checkbox" 
+        [id]="task.id" 
+        [checked]="selectedTasksId.has(task.id)"
+        (change)="toggleTaskSecection(task.id)"
+      />
+      <label [for]="task.id">
+        <strong>{{ task.title }}</strong> - 
+        Type: {{ task.getTaskType() }}, 
+        Difficulty: {{ task.difficulty }}, 
+        Status: {{ task.status }}
+        <ng-container *ngIf="task.getTaskType() === TaskType.Implementation">
+          Description: {{ getDescription(task) }} 
+        </ng-container>
+        <ng-container *ngIf="task.getTaskType() === TaskType.Maintenance">
+          Servers: {{ getServers(task) }}
+          Services: {{ getServices(task) }}
+        </ng-container>
+        <ng-container *ngIf="task.getTaskType() === TaskType.Deployment">
+          Deadline: {{ getDeadline(task) | date }}
+          Description: {{ getDescription(task) }}
+        </ng-container>
+      </label>
+    </div>
+  </div>
+
+  <!-- Zadania -->
+    <h3>Assign Tasks</h3>
+    <div class="task-list">
+      <div *ngFor="let task of assignUserTasks" class="task-item">
+        <input 
+          type="checkbox" 
+          [id]="task.id" 
+          [checked]="selectedTasksId.has(task.id)"
+          (change)="toggleTaskSecection(task.id)"
+        />
+        <label [for]="task.id">
+          <strong>{{ task.title }}</strong> - 
+          Type: {{ task.getTaskType() }}, 
+          Difficulty: {{ task.difficulty }}, 
+          Status: {{ task.status }}
+          <ng-container *ngIf="task.getTaskType() === TaskType.Implementation">
+            Description: {{ getDescription(task) }} 
+          </ng-container>
+          <ng-container *ngIf="task.getTaskType() === TaskType.Maintenance">
+            Servers: {{ getServers(task) }}
+            Services: {{ getServices(task) }}
+          </ng-container>
+          <ng-container *ngIf="task.getTaskType() === TaskType.Deployment">
+            Deadline: {{ getDeadline(task) | date }}
+            Description: {{ getDescription(task) }}
+          </ng-container>
+        </label>
+      </div>
+    </div>
+
+  <!-- Walidacja -->
+  <div class="error-message" *ngIf="message" style="color: red;">
+    {{ message }}
+  </div>
+
+  <!-- Przyciski -->
+  <button (click)="assignTask()" [disabled]="!SelectedUserId || selectedTasksId.size === 0">
+    Assign Selected Tasks
+  </button>
+</div>
+
+<!-- Ładowanie -->
+<ng-template #loading>
+  <p>Loading users and tasks...</p>
+</ng-template>
